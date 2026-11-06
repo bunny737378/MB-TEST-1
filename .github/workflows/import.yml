@@ -1,5 +1,5 @@
 
-name: Import Decompiled Files
+name: Import Decompiled Files to Root
 
 on:
   workflow_dispatch:
@@ -24,7 +24,7 @@ jobs:
         with:
           ref: main
 
-      - name: Download Previous ZIP Artifact
+      - name: Download ZIP Artifact
         uses: actions/download-artifact@v4
         with:
           name: APK-DECOMPILED-OUTPUT
@@ -40,38 +40,43 @@ jobs:
           ZIP_FILE=$(find artifact -name "APK-OUTPUT.zip" -print -quit)
 
           if [ -z "$ZIP_FILE" ]; then
-            echo "APK-OUTPUT.zip not found!"
+            echo "ZIP not found!"
             exit 1
           fi
 
           unzip -q "$ZIP_FILE" -d extracted
 
           if [ ! -d extracted/decompiled ]; then
-            echo "decompiled folder not found!"
+            echo "Decompiled folder missing!"
             exit 1
           fi
 
-      - name: Import Decompiled Files
+      - name: Remove Old Decompiled Folder
         run: |
           rm -rf decompiled
-          mkdir -p decompiled
 
-          cp -a extracted/decompiled/. decompiled/
+      - name: Copy All Files to Repository Root
+        run: |
+          cp -a extracted/decompiled/. .
 
-          echo "Imported files:"
-          find decompiled -type f | head -100
+          echo "Root files:"
+          ls -la
 
-      - name: Commit Files to Repository
+      - name: Remove Temporary Files
+        run: |
+          rm -rf extracted artifact
+
+      - name: Commit and Push
         run: |
           git config user.name "github-actions[bot]"
           git config user.email \
             "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git add decompiled/
+          git add -A
 
           if git diff --cached --quiet; then
             echo "No changes to commit."
           else
-            git commit -m "Import decompiled APK files"
+            git commit -m "Import decompiled files into repository root"
             git push origin main
           fi
