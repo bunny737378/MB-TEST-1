@@ -1,0 +1,77 @@
+
+name: Import Decompiled Files
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: "Decompile workflow Run ID"
+        required: true
+        type: string
+        default: "42151163725"
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Download Previous ZIP Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: APK-DECOMPILED-OUTPUT
+          path: artifact
+          repository: ${{ github.repository }}
+          run-id: ${{ inputs.run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract ZIP
+        run: |
+          mkdir -p extracted
+
+          ZIP_FILE=$(find artifact -name "APK-OUTPUT.zip" -print -quit)
+
+          if [ -z "$ZIP_FILE" ]; then
+            echo "APK-OUTPUT.zip not found!"
+            exit 1
+          fi
+
+          unzip -q "$ZIP_FILE" -d extracted
+
+          if [ ! -d extracted/decompiled ]; then
+            echo "decompiled folder not found!"
+            exit 1
+          fi
+
+      - name: Import Decompiled Files
+        run: |
+          rm -rf decompiled
+          mkdir -p decompiled
+
+          cp -a extracted/decompiled/. decompiled/
+
+          echo "Imported files:"
+          find decompiled -type f | head -100
+
+      - name: Commit Files to Repository
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email \
+            "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add decompiled/
+
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "Import decompiled APK files"
+            git push origin main
+          fi
