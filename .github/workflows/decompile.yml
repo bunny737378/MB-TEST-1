@@ -1,0 +1,47 @@
+name: APK Decompile Demo
+
+on:
+  workflow_dispatch:
+    inputs:
+      apk_url:
+        description: "Demo APK URL"
+        required: true
+        type: string
+        default: "https://tgfile2link-senpaii-v10.vercel.app/1245/BQACAgUAAxkBAAIC0GrtNbLbNXGZ7i2uSVqaqs4rwAeoAAK_IgAC9tlpVjETKPKFKShcPQQ"
+
+permissions:
+  contents: read
+
+jobs:
+  process:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Setup tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y apktool zip unzip
+
+      - name: Download APK
+        env:
+          APK_URL: ${{ inputs.apk_url }}
+        run: |
+          mkdir -p output
+          curl -fL "$APK_URL" -o output/app.apk
+
+      - name: Check APK
+        run: |
+          file output/app.apk
+          unzip -t output/app.apk
+
+      - name: Create ZIP
+        run: |
+          cd output
+          zip -r ../apk-output.zip app.apk
+
+      - name: Upload ZIP Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: apk-output
+          path: apk-output.zip
+          retention-days: 7
