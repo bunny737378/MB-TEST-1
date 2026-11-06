@@ -1,0 +1,615 @@
+.class public abstract Lc1/a;
+.super Ljava/lang/Object;
+.source "source.java"
+
+
+# annotations
+.annotation system Ldalvik/annotation/MemberClasses;
+    value = {
+        Lc1/a$a;,
+        Lc1/a$b;
+    }
+.end annotation
+
+
+# direct methods
+.method private static a(Landroid/location/Location;Ljava/lang/String;)Z
+    .locals 0
+
+    .line 1
+    invoke-virtual {p0}, Landroid/location/Location;->getExtras()Landroid/os/Bundle;
+
+    .line 2
+    .line 3
+    .line 4
+    move-result-object p0
+
+    .line 5
+    if-eqz p0, :cond_0
+
+    .line 6
+    .line 7
+    invoke-virtual {p0, p1}, Landroid/os/BaseBundle;->containsKey(Ljava/lang/String;)Z
+
+    .line 8
+    .line 9
+    .line 10
+    move-result p0
+
+    .line 11
+    if-eqz p0, :cond_0
+
+    .line 12
+    .line 13
+    const/4 p0, 0x1
+
+    .line 14
+    goto :goto_0
+
+    .line 15
+    :cond_0
+    const/4 p0, 0x0
+
+    .line 16
+    :goto_0
+    return p0
+    .line 17
+    .line 18
+    .line 19
+    .line 20
+    .line 21
+    .line 22
+    .line 23
+    .line 24
+    .line 25
+    .line 26
+    .line 27
+    .line 28
+    .line 29
+    .line 30
+    .line 31
+    .line 32
+    .line 33
+    .line 34
+    .line 35
+    .line 36
+    .line 37
+    .line 38
+    .line 39
+.end method
+
+.method public static b(Landroid/location/Location;)F
+    .locals 2
+
+    .line 1
+    sget v0, Landroid/os/Build$VERSION;->SDK_INT:I
+
+    .line 2
+    .line 3
+    const/16 v1, 0x1a
+
+    .line 4
+    .line 5
+    if-lt v0, v1, :cond_0
+
+    .line 6
+    .line 7
+    invoke-static {p0}, Lc1/a$a;->a(Landroid/location/Location;)F
+
+    .line 8
+    .line 9
+    .line 10
+    move-result p0
+
+    .line 11
+    return p0
+
+    .line 12
+    :cond_0
+    invoke-virtual {p0}, Landroid/location/Location;->getExtras()Landroid/os/Bundle;
+
+    .line 13
+    .line 14
+    .line 15
+    move-result-object p0
+
+    .line 16
+    const/4 v0, 0x0
+
+    .line 17
+    if-nez p0, :cond_1
+
+    .line 18
+    .line 19
+    return v0
+
+    .line 20
+    :cond_1
+    const-string v1, "bearingAccuracy"
+
+    .line 21
+    .line 22
+    invoke-virtual {p0, v1, v0}, Landroid/os/Bundle;->getFloat(Ljava/lang/String;F)F
+
+    .line 23
+    .line 24
+    .line 25
+    move-result p0
+
+    .line 26
+    return p0
+    .line 27
+    .line 28
+    .line 29
+    .line 30
+    .line 31
+    .line 32
+    .line 33
+    .line 34
+    .line 35
+    .line 36
+    .line 37
+    .line 38
+    .line 39
+    .line 40
+    .line 41
+    .line 42
+    .line 43
+    .line 44
+    .line 45
+    .line 46
+    .line 47
+    .line 48
+    .line 49
+    .line 50
+    .line 51
+    .line 52
+    .line 53
+    .line 54
+    .line 55
+    .line 56
+    .line 57
+    .line 58
+    .line 59
+    .line 60
+    .line 61
+    .line 62
+    .line 63
+    .line 64
+    .line 65
+    .line 66
+    .line 67
+    .line 68
+.end method
+
+.method public static c(Landroid/location/Location;)J
+    .locals 3
+
+    .line 1
+    sget-object v0, Ljava/util/concurrent/TimeUnit;->NANOSECONDS:Ljava/util/concurrent/TimeUnit;
+
+    .line 2
+    .line 3
+    invoke-virtual {p0}, Landroid/location/Location;->getElapsedRealtimeNanos()J
+
+    .line 4
+    .line 5
+    .line 6
+    move-result-wide v1
+
+    .line 7
+    invoke-virtual {v0, v1, v2}, Ljava/util/concurrent/TimeUnit;->toMillis(J)J
+
+    .line 8
+    .line 9
+    .line 10
+    move-result-wide v0
+
+    .line 11
+    return-wide v0
+    .line 12
+    .line 13
+    .line 14
+    .line 15
+    .line 16
+    .line 17
+    .line 18
+    .line 19
+    .line 20
+    .line 21
+    .line 22
+.end method
+
+.method public static d(Landroid/location/Location;)F
+    .locals 2
+
+    .line 1
+    sget v0, Landroid/os/Build$VERSION;->SDK_INT:I
+
+    .line 2
+    .line 3
+    const/16 v1, 0x1a
+
+    .line 4
+    .line 5
+    if-lt v0, v1, :cond_0
+
+    .line 6
+    .line 7
+    invoke-static {p0}, Lc1/a$a;->b(Landroid/location/Location;)F
+
+    .line 8
+    .line 9
+    .line 10
+    move-result p0
+
+    .line 11
+    return p0
+
+    .line 12
+    :cond_0
+    invoke-virtual {p0}, Landroid/location/Location;->getExtras()Landroid/os/Bundle;
+
+    .line 13
+    .line 14
+    .line 15
+    move-result-object p0
+
+    .line 16
+    const/4 v0, 0x0
+
+    .line 17
+    if-nez p0, :cond_1
+
+    .line 18
+    .line 19
+    return v0
+
+    .line 20
+    :cond_1
+    const-string v1, "speedAccuracy"
+
+    .line 21
+    .line 22
+    invoke-virtual {p0, v1, v0}, Landroid/os/Bundle;->getFloat(Ljava/lang/String;F)F
+
+    .line 23
+    .line 24
+    .line 25
+    move-result p0
+
+    .line 26
+    return p0
+    .line 27
+    .line 28
+    .line 29
+    .line 30
+    .line 31
+    .line 32
+    .line 33
+    .line 34
+    .line 35
+    .line 36
+    .line 37
+    .line 38
+    .line 39
+    .line 40
+    .line 41
+    .line 42
+    .line 43
+    .line 44
+    .line 45
+    .line 46
+    .line 47
+    .line 48
+    .line 49
+    .line 50
+    .line 51
+    .line 52
+    .line 53
+    .line 54
+    .line 55
+    .line 56
+    .line 57
+    .line 58
+    .line 59
+    .line 60
+    .line 61
+    .line 62
+    .line 63
+    .line 64
+    .line 65
+    .line 66
+    .line 67
+    .line 68
+.end method
+
+.method public static e(Landroid/location/Location;)F
+    .locals 2
+
+    .line 1
+    sget v0, Landroid/os/Build$VERSION;->SDK_INT:I
+
+    .line 2
+    .line 3
+    const/16 v1, 0x1a
+
+    .line 4
+    .line 5
+    if-lt v0, v1, :cond_0
+
+    .line 6
+    .line 7
+    invoke-static {p0}, Lc1/a$a;->c(Landroid/location/Location;)F
+
+    .line 8
+    .line 9
+    .line 10
+    move-result p0
+
+    .line 11
+    return p0
+
+    .line 12
+    :cond_0
+    invoke-virtual {p0}, Landroid/location/Location;->getExtras()Landroid/os/Bundle;
+
+    .line 13
+    .line 14
+    .line 15
+    move-result-object p0
+
+    .line 16
+    const/4 v0, 0x0
+
+    .line 17
+    if-nez p0, :cond_1
+
+    .line 18
+    .line 19
+    return v0
+
+    .line 20
+    :cond_1
+    const-string v1, "verticalAccuracy"
+
+    .line 21
+    .line 22
+    invoke-virtual {p0, v1, v0}, Landroid/os/Bundle;->getFloat(Ljava/lang/String;F)F
+
+    .line 23
+    .line 24
+    .line 25
+    move-result p0
+
+    .line 26
+    return p0
+    .line 27
+    .line 28
+    .line 29
+    .line 30
+    .line 31
+    .line 32
+    .line 33
+    .line 34
+    .line 35
+    .line 36
+    .line 37
+    .line 38
+    .line 39
+    .line 40
+    .line 41
+    .line 42
+    .line 43
+    .line 44
+    .line 45
+    .line 46
+    .line 47
+    .line 48
+    .line 49
+    .line 50
+    .line 51
+    .line 52
+    .line 53
+    .line 54
+    .line 55
+    .line 56
+    .line 57
+    .line 58
+    .line 59
+    .line 60
+    .line 61
+    .line 62
+    .line 63
+    .line 64
+    .line 65
+    .line 66
+    .line 67
+    .line 68
+.end method
+
+.method public static f(Landroid/location/Location;)Z
+    .locals 2
+
+    .line 1
+    sget v0, Landroid/os/Build$VERSION;->SDK_INT:I
+
+    .line 2
+    .line 3
+    const/16 v1, 0x1a
+
+    .line 4
+    .line 5
+    if-lt v0, v1, :cond_0
+
+    .line 6
+    .line 7
+    invoke-static {p0}, Lc1/a$a;->d(Landroid/location/Location;)Z
+
+    .line 8
+    .line 9
+    .line 10
+    move-result p0
+
+    .line 11
+    return p0
+
+    .line 12
+    :cond_0
+    const-string v0, "bearingAccuracy"
+
+    .line 13
+    .line 14
+    invoke-static {p0, v0}, Lc1/a;->a(Landroid/location/Location;Ljava/lang/String;)Z
+
+    .line 15
+    .line 16
+    .line 17
+    move-result p0
+
+    .line 18
+    return p0
+    .line 19
+    .line 20
+    .line 21
+    .line 22
+.end method
+
+.method public static g(Landroid/location/Location;)Z
+    .locals 2
+
+    .line 1
+    sget v0, Landroid/os/Build$VERSION;->SDK_INT:I
+
+    .line 2
+    .line 3
+    const/16 v1, 0x1a
+
+    .line 4
+    .line 5
+    if-lt v0, v1, :cond_0
+
+    .line 6
+    .line 7
+    invoke-static {p0}, Lc1/a$a;->e(Landroid/location/Location;)Z
+
+    .line 8
+    .line 9
+    .line 10
+    move-result p0
+
+    .line 11
+    return p0
+
+    .line 12
+    :cond_0
+    const-string v0, "speedAccuracy"
+
+    .line 13
+    .line 14
+    invoke-static {p0, v0}, Lc1/a;->a(Landroid/location/Location;Ljava/lang/String;)Z
+
+    .line 15
+    .line 16
+    .line 17
+    move-result p0
+
+    .line 18
+    return p0
+    .line 19
+    .line 20
+    .line 21
+    .line 22
+.end method
+
+.method public static h(Landroid/location/Location;)Z
+    .locals 2
+
+    .line 1
+    sget v0, Landroid/os/Build$VERSION;->SDK_INT:I
+
+    .line 2
+    .line 3
+    const/16 v1, 0x1a
+
+    .line 4
+    .line 5
+    if-lt v0, v1, :cond_0
+
+    .line 6
+    .line 7
+    invoke-static {p0}, Lc1/a$a;->f(Landroid/location/Location;)Z
+
+    .line 8
+    .line 9
+    .line 10
+    move-result p0
+
+    .line 11
+    return p0
+
+    .line 12
+    :cond_0
+    const-string v0, "verticalAccuracy"
+
+    .line 13
+    .line 14
+    invoke-static {p0, v0}, Lc1/a;->a(Landroid/location/Location;Ljava/lang/String;)Z
+
+    .line 15
+    .line 16
+    .line 17
+    move-result p0
+
+    .line 18
+    return p0
+    .line 19
+    .line 20
+    .line 21
+    .line 22
+.end method
+
+.method public static i(Landroid/location/Location;)Z
+    .locals 2
+
+    .line 1
+    sget v0, Landroid/os/Build$VERSION;->SDK_INT:I
+
+    .line 2
+    .line 3
+    const/16 v1, 0x1f
+
+    .line 4
+    .line 5
+    if-lt v0, v1, :cond_0
+
+    .line 6
+    .line 7
+    invoke-static {p0}, Lc1/a$b;->a(Landroid/location/Location;)Z
+
+    .line 8
+    .line 9
+    .line 10
+    move-result p0
+
+    .line 11
+    return p0
+
+    .line 12
+    :cond_0
+    invoke-virtual {p0}, Landroid/location/Location;->isFromMockProvider()Z
+
+    .line 13
+    .line 14
+    .line 15
+    move-result p0
+
+    .line 16
+    return p0
+    .line 17
+    .line 18
+    .line 19
+    .line 20
+    .line 21
+    .line 22
+.end method
