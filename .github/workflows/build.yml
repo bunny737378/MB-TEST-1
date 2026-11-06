@@ -1,4 +1,3 @@
-
 name: Rebuild APK
 
 on:
@@ -18,24 +17,20 @@ jobs:
         with:
           ref: main
 
-      - name: Verify Decompiled Project
+      - name: Find Decompiled Project
         run: |
-          test -f apktool.yml || {
-            echo "ERROR: apktool.yml missing"
+          APKTOOL_YML=$(find . -name apktool.yml -not -path './.git/*' | head -1)
+          if [ -z "$APKTOOL_YML" ]; then
+            echo "ERROR: apktool.yml not found anywhere in the repo"
             exit 1
-          }
+          fi
 
-          test -f AndroidManifest.xml || {
-            echo "ERROR: AndroidManifest.xml missing"
-            exit 1
-          }
+          PROJECT_DIR=$(cd "$(dirname "$APKTOOL_YML")" && pwd)
+          test -f "$PROJECT_DIR/AndroidManifest.xml" || { echo "ERROR: AndroidManifest.xml missing"; exit 1; }
+          test -d "$PROJECT_DIR/res" || { echo "ERROR: res folder missing"; exit 1; }
 
-          test -d res || {
-            echo "ERROR: res folder missing"
-            exit 1
-          }
-
-          echo "Project verified."
+          echo "PROJECT_DIR=$PROJECT_DIR" >> "$GITHUB_ENV"
+          echo "Project found at: $PROJECT_DIR"
 
       - name: Install Java
         uses: actions/setup-java@v4
@@ -43,60 +38,74 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Install Android Build Tools
-        uses: android-actions/setup-android@v3
-
-      - name: Install Build Tools 35
+      - name: Locate Android Build Tools
         run: |
-          sdkmanager "build-tools;35.0.0"
+          SDK="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}}"
+
+          if [ -d "$SDK/build-tools/35.0.0" ]; then
+            BT="$SDK/build-tools/35.0.0"
+          else
+            BT=$(ls -d "$SDK"/build-tools/*/ 2>/dev/null | sort -V | tail -1 || true)
+            BT="${BT%/}"
+          fi
+
+          if [ -z "$BT" ]; then
+            echo "No build-tools preinstalled, installing 35.0.0"
+            yes | "$SDK/cmdline-tools/latest/bin/sdkmanager" --sdk_root="$SDK" "build-tools;35.0.0"
+            BT="$SDK/build-tools/35.0.0"
+          fi
+
+          test -x "$BT/zipalign" || { echo "ERROR: zipalign not found in $BT"; exit 1; }
+          test -x "$BT/apksigner" || { echo "ERROR: apksigner not found in $BT"; exit 1; }
+
+          echo "Using build-tools: $BT"
+          echo "BUILD_TOOLS=$BT" >> "$GITHUB_ENV"
 
       - name: Install Latest Apktool
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          VERSION="3.0.3"
+          TAG=$(curl -fsSL -H "Authorization: Bearer ${GH_TOKEN}" \
+            https://api.github.com/repos/iBotPeaches/Apktool/releases/latest \
+            | jq -r .tag_name || true)
+
+          if [ -z "$TAG" ] || [ "$TAG" = "null" ]; then
+            echo "Could not detect latest release, falling back"
+            TAG="v2.12.1"
+          fi
+          VER="${TAG#v}"
+          echo "Apktool version: $VER"
 
           curl -fL \
-            "https://github.com/iBotPeaches/Apktool/releases/download/v${VERSION}/apktool_${VERSION}.jar" \
+            "https://github.com/iBotPeaches/Apktool/releases/download/${TAG}/apktool_${VER}.jar" \
             -o "$RUNNER_TEMP/apktool.jar"
 
-          cat > "$RUNNER_TEMP/apktool" <<'EOF'
-          #!/bin/sh
-          exec java -jar "$RUNNER_TEMP/apktool.jar" "$@"
-          EOF
-
-          chmod +x "$RUNNER_TEMP/apktool"
-
-          echo "$RUNNER_TEMP" >> "$GITHUB_PATH"
-
+          echo "APKTOOL_JAR=$RUNNER_TEMP/apktool.jar" >> "$GITHUB_ENV"
           java -jar "$RUNNER_TEMP/apktool.jar" --version
 
       - name: Inspect Resource Filenames
         run: |
           echo "Checking invalid Android resource names..."
-
-          find res -type f | while IFS= read -r file; do
+          find "$PROJECT_DIR/res" -type f | while IFS= read -r file; do
             name=$(basename "$file")
-
             if [[ ! "$name" =~ ^[a-z0-9_.]+$ ]]; then
               echo "Invalid resource: $file"
             fi
           done
+          echo "Done."
 
       - name: Rebuild APK
         run: |
-          mkdir -p build-output
-
-          apktool b . \
-            -o build-output/app-unsigned.apk \
+          mkdir -p "$GITHUB_WORKSPACE/build-output"
+          cd "$PROJECT_DIR"
+          java -jar "$APKTOOL_JAR" b . \
+            -o "$GITHUB_WORKSPACE/build-output/app-unsigned.apk" \
             -f
 
       - name: Align APK
         run: |
-          BUILD_TOOLS="$ANDROID_HOME/build-tools/35.0.0"
-
-          "$BUILD_TOOLS/zipalign" \
-            -p -f 4 \
-            build-output/app-unsigned.apk \
-            build-output/app-aligned.apk
+          cd "$GITHUB_WORKSPACE/build-output"
+          "$BUILD_TOOLS/zipalign" -p -f 4 app-unsigned.apk app-aligned.apk
 
       - name: Generate Debug Keystore
         run: |
@@ -112,29 +121,25 @@ jobs:
 
       - name: Sign APK
         run: |
-          BUILD_TOOLS="$ANDROID_HOME/build-tools/35.0.0"
-
+          cd "$GITHUB_WORKSPACE/build-output"
           "$BUILD_TOOLS/apksigner" sign \
             --ks "$RUNNER_TEMP/debug.keystore" \
             --ks-key-alias androiddebugkey \
             --ks-pass pass:android \
             --key-pass pass:android \
-            --out build-output/app-debug.apk \
-            build-output/app-aligned.apk
+            --out app-debug.apk \
+            app-aligned.apk
 
       - name: Verify APK
         run: |
-          BUILD_TOOLS="$ANDROID_HOME/build-tools/35.0.0"
-
-          "$BUILD_TOOLS/apksigner" verify \
-            --verbose \
-            build-output/app-debug.apk
-
-          file build-output/app-debug.apk
+          cd "$GITHUB_WORKSPACE/build-output"
+          "$BUILD_TOOLS/apksigner" verify --verbose app-debug.apk
+          file app-debug.apk
 
       - name: Upload Rebuilt APK
         uses: actions/upload-artifact@v4
         with:
           name: REBUILT-APK
           path: build-output/app-debug.apk
+          if-no-files-found: error
           retention-days: 7
