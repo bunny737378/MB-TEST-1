@@ -1,11 +1,11 @@
 
-name: APK Decompile and Extract
+name: APK Decompile
 
 on:
   workflow_dispatch:
     inputs:
       apk_url:
-        description: "Direct APK Download URL"
+        description: "Direct APK download URL"
         required: true
         type: string
         default: "https://tgfile2link-senpaii-v10.vercel.app/1245/BQACAgUAAxkBAAIC0GrtNbLbNXGZ7i2uSVqaqs4rwAeoAAK_IgAC9tlpVjETKPKFKShcPQQ"
@@ -22,15 +22,11 @@ jobs:
       - name: Setup workspace
         run: |
           mkdir -p output/decompiled
-          mkdir -p output/raw
 
-      - name: Install tools
+      - name: Install APKTool
         run: |
           sudo apt-get update
-          sudo apt-get install -y \
-            apktool \
-            zip \
-            unzip
+          sudo apt-get install -y apktool zip unzip
 
       - name: Download APK
         env:
@@ -45,22 +41,16 @@ jobs:
           file output/app.apk
           unzip -t output/app.apk
 
-      - name: APKTool Decompile
+      - name: Decompile APK
         run: |
           apktool d output/app.apk \
             -o output/decompiled \
             -f
 
-      - name: Extract Raw APK
-        run: |
-          unzip -o output/app.apk \
-            -d output/raw
-
-      - name: Generate ZIP
+      - name: Create ZIP
         run: |
           cd output
-          zip -qr ../APK-OUTPUT.zip \
-            decompiled raw
+          zip -qr ../APK-OUTPUT.zip decompiled/
 
       - name: Upload ZIP Artifact
         uses: actions/upload-artifact@v4
